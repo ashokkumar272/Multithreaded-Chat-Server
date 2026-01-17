@@ -10,7 +10,8 @@ public class ChatClient {
     private boolean isConnected;
     private String username;
     
-    private static final String SERVER_IP = "192.168.56.1";
+    // private static final String SERVER_IP = "192.168.56.1";
+    private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 12345;
     
     public ChatClient() {
@@ -87,7 +88,7 @@ public class ChatClient {
         while (isConnected) {
             try {
                 if (scanner.hasNextLine()) {
-                    System.out.print("[" + username + "]: ");
+                    // System.out.print("[" + username + "]: ");
                     String message = scanner.nextLine().trim();
                     
                     if (message.isEmpty()) continue;

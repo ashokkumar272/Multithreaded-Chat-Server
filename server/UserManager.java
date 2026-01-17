@@ -192,7 +192,7 @@ public class UserManager {
         synchronized (lock) {
             StringBuilder stats = new StringBuilder();
             stats.append("=".repeat(40)).append("\n");
-            stats.append("📊 SERVER STATISTICS\n");
+            stats.append("SERVER STATISTICS\n");
             stats.append("=".repeat(40)).append("\n");
             stats.append("Active Users: ").append(activeUsers.size()).append("\n");
             stats.append("Total Users Ever: ").append(userHistory.size()).append("\n");

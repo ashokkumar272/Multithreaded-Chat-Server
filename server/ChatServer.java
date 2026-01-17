@@ -52,9 +52,7 @@ public class ChatServer {
             System.out.println("=".repeat(50));
             System.out.println("Chat Server Started Successfully!");
             System.out.println("Listening on port: " + port);
-            System.out.println("Server started at: " + new Date());
             System.out.println("=".repeat(50));
-            System.out.println("Waiting for client connections...\n");
             
             // Main server loop - accept client connections
             while (isRunning) {
@@ -63,8 +61,7 @@ public class ChatServer {
                     totalConnections++;
                     
                     String clientAddress = clientSocket.getInetAddress().getHostAddress();
-                    System.out.println("New connection #" + totalConnections + 
-                                     " from " + clientAddress + ":" + clientSocket.getPort());
+                    System.out.println("New connection #" + totalConnections + " from " + clientAddress + ":" + clientSocket.getPort());
                     
                     // Create and start new thread for each client
                     ClientHandler clientHandler = new ClientHandler(clientSocket, this);
@@ -110,7 +107,6 @@ public class ChatServer {
             System.out.println("\n" + "=".repeat(50));
             System.out.println("Chat Server Stopped");
             System.out.println("Total connections served: " + totalConnections);
-            System.out.println("Shutdown time: " + new Date());
             System.out.println("=".repeat(50));
             
         } catch (IOException e) {
@@ -142,7 +138,7 @@ public class ChatServer {
      */
     public void removeClient(String username) {
         if (userManager.removeUser(username)) {
-            System.out.println("👋 User '" + username + "' disconnected. Active users: " + userManager.getActiveUserCount());
+            System.out.println("User '" + username + "' disconnected. Active users: " + userManager.getActiveUserCount());
         }
     }
     
