@@ -4,7 +4,7 @@ A **concurrent real-time chat server** built in Java using sockets and multithre
 
 ## 🎯 Project Overview
 
-This chat server can handle **multiple client connections simultaneously** using dedicated threads for each client. It features thread-safe operations, message broadcasting, private messaging, and a clean command-based interface.
+This chat server can handle **multiple client connections simultaneously** using dedicated threads for each client. It features thread-safe operations and broadcast messaging where all messages are sent to all connected users.
 
 ### 🧠 Key Learning Objectives
 
@@ -16,51 +16,55 @@ This chat server can handle **multiple client connections simultaneously** using
 
 ## 🏗️ Architecture
 
-The project consists of four main components:
+The project is organized into server and client folders:
 
 ```
 📁 Multithreaded-Chat-Server/
-├── 📄 ChatServer.java      → Main server class, manages client threads
-├── 📄 ClientHandler.java   → Handles individual client communication  
-├── 📄 Message.java         → Message data structure (POJO)
-├── 📄 SimpleClient.java    → Test client for server validation
-└── 📄 README.md           → This documentation
+├── 📁 server/
+│   ├── 📄 ChatServer.java      → Main server class, manages client threads
+│   ├── 📄 ClientHandler.java   → Handles individual client communication  
+│   ├── 📄 UserManager.java     → Manages user connections and history
+│   └── 📄 Message.java         → Message data structure (POJO)
+├── 📁 client/
+│   ├── 📄 ChatClient.java      → Client application
+│   └── 📄 Message.java         → Message data structure (POJO)
+└── 📄 README.md               → This documentation
 ```
 
 ### 🔧 Core Components
 
+**Server Side:**
 1. **ChatServer.java**: Main entry point, accepts connections, spawns client threads
 2. **ClientHandler.java**: Manages individual client sessions in separate threads  
-3. **Message.java**: Data structure for different message types (broadcast, private, system)
-4. **SimpleClient.java**: Command-line client for testing the server
+3. **UserManager.java**: Handles user registration, tracking, and re-entry logic
+4. **Message.java**: Data structure for message types (broadcast and system)
+
+**Client Side:**
+1. **ChatClient.java**: Client application for connecting to the server and sending messages
+2. **Message.java**: Shared message data structure
 
 ## ✨ Features
 
 ### 🌐 Server Features
 - ✅ **Concurrent client handling** with dedicated threads
 - ✅ **Thread-safe client management** using synchronized blocks
-- ✅ **Message broadcasting** to all connected users
-- ✅ **Private messaging** between users
+- ✅ **Broadcast messaging** to all connected users
 - ✅ **User re-entry support** - existing users can reconnect seamlessly
 - ✅ **Connection history tracking** with personalized welcome messages
-- ✅ **Enhanced command processing** (/help, /list, /whisper, /whoami, /stats, /exit)
 - ✅ **Graceful client disconnection** handling
 - ✅ **Server statistics** and logging
 - ✅ **Shutdown hooks** for clean server termination
 
-### 💬 Chat Commands
-| Command | Description | Example |
-|---------|-------------|---------|
-| `/help` | Show available commands | `/help` |
-| `/list` | List all connected users | `/list` |
-| `/whisper <user> <message>` | Send private message | `/whisper john Hello there!` |
-| `/whoami` | Show your connection info | `/whoami` |
-| `/stats` | Show server statistics | `/stats` |
-| `/exit` | Disconnect from server | `/exit` |
+### 💬 Chat Mode
+All messages are **broadcast to everyone**. Simply type your message and press Enter - no commands needed!
+
+- Messages appear to all connected users except the sender
+- System notifications for user join/leave events
+- Simple and straightforward chat experience
 
 ### 🔒 Thread Safety
-- **ConcurrentHashMap** for client storage
 - **Synchronized blocks** for critical operations
+- **Thread-safe user management** via UserManager
 - **Atomic operations** for client add/remove
 - **Safe message broadcasting** without race conditions
 
@@ -68,8 +72,7 @@ The project consists of four main components:
 - **Seamless Reconnection**: Users can disconnect and reconnect with the same username
 - **Connection History**: Server tracks user connection statistics and timestamps
 - **Personalized Welcome**: Different messages for new vs. returning users
-- **User Information**: `/whoami` command shows personal connection details
-- **Server Statistics**: `/stats` command displays server-wide user analytics
+- **Connection Tracking**: Server maintains history of all user connections
 
 ## 🚀 Quick Start
 
@@ -83,13 +86,22 @@ The project consists of four main components:
 # Navigate to project directory
 cd Multithreaded-Chat-Server
 
-# Compile all Java files
+# Compile server files
+cd server
 javac *.java
+
+# Compile client files
+cd ../client
+javac *.java
+cd ..
 ```
 
 ### 2. Start the Server
 
 ```bash
+# Navigate to server directory
+cd server
+
 # Start server on default port 12345
 java ChatServer
 
@@ -100,30 +112,34 @@ java ChatServer 8080
 **Expected Output:**
 ```
 ==================================================
-🚀 Chat Server Started Successfully!
-📡 Listening on port: 12345
-⏰ Server started at: Wed Oct 23 10:30:45 EST 2025
+Chat Server Started Successfully!
+Listening on port: 12345
+Server started at: Fri Jan 17 10:30:45 EST 2026
 ==================================================
 Waiting for client connections...
 ```
 
 ### 3. Connect Clients
 
-#### Option A: Using the Provided Test Client
+#### Using the Chat Client
 ```bash
-# In a new terminal window
-java SimpleClient
+# In a new terminal window, navigate to client directory
+cd client
 
-# Or connect to specific server
-java SimpleClient localhost 8080
+# Run the client
+java ChatClient
+
+# Follow the prompts to enter your username and start chatting
 ```
 
-#### Option B: Using Telnet (Windows)
+**Note:** Update the `SERVER_IP` constant in ChatClient.java to match your server's IP address (default is 192.168.56.1).
+
+#### Alternative: Using Telnet (Windows)
 ```bash
 telnet localhost 12345
 ```
 
-#### Option C: Using Netcat (Linux/Mac)
+#### Alternative: Using Netcat (Linux/Mac)
 ```bash
 nc localhost 12345
 ```
@@ -134,55 +150,65 @@ nc localhost 12345
 
 1. **Start the server:**
    ```bash
+   cd server
    java ChatServer
    ```
 
 2. **Connect first client:**
    ```bash
-   java SimpleClient
+   cd client
+   java ChatClient
    # Enter username: Alice
    ```
 
-3. **Connect second client:**
+3. **Connect second client (in another terminal):**
    ```bash
-   java SimpleClient  
+   cd client
+   java ChatClient
    # Enter username: Bob
    ```
 
 4. **Chat conversation:**
    ```
-   Alice: Hello everyone!
-   Bob: Hi Alice! How are you?
-   Alice: /whisper Bob I'm doing great, thanks!
-   Bob: /list
-   Server: Connected users: Alice, Bob
+   [Alice]: Hello everyone!
+   # Output on Bob's screen: Alice: Hello everyone!
+   
+   [Bob]: Hi Alice! How are you?
+   # Output on Alice's screen: Bob: Hi Alice! How are you?
+   
+   [Alice]: Great to chat with you!
+   # Output on Bob's screen: Alice: Great to chat with you!
    ```
 
-### Example 2: Multiple Clients with Commands
+### Example 2: Multiple Clients Broadcasting
 
 ```bash
 # Terminal 1 - Server
-java ChatServer 12345
+cd server
+java ChatServer
 
-# Terminal 2 - Client 1
-java SimpleClient localhost 12345
+# Terminal 2 - Client 1 (Alice)
+cd client
+java ChatClient
 # Username: Alice
-Alice: Hello chat room!
-Alice: /list
-Alice: /whisper Bob Hey Bob, private message!
+[Alice]: Hello chat room!
 
-# Terminal 3 - Client 2  
-java SimpleClient localhost 12345
+# Terminal 3 - Client 2 (Bob)
+cd client
+java ChatClient
 # Username: Bob
-Bob: Hi Alice!
-Bob: /help
-Bob: /exit
+# Sees: [SYSTEM] Alice has joined the chat for the first time!
+[Bob]: Hi everyone!
 
-# Terminal 4 - Client 3
-java SimpleClient localhost 12345
+# Terminal 4 - Client 3 (Charlie)
+cd client
+java ChatClient
 # Username: Charlie
-Charlie: Anyone there?
-Charlie: /list
+# Sees: [SYSTEM] Alice has joined...
+# Sees: [SYSTEM] Bob has joined...
+[Charlie]: Hey folks!
+
+# All messages are broadcast to everyone except the sender
 ```
 
 ## 🔍 Testing the Server
@@ -191,8 +217,8 @@ Charlie: /list
 
 - [ ] **Multiple clients can connect simultaneously**
 - [ ] **Messages are broadcasted to all users except sender**
-- [ ] **Private messages work correctly**
-- [ ] **User list shows all connected clients**
+- [ ] **System messages appear for user join/leave events**
+- [ ] **Returning users get personalized welcome messages**
 - [ ] **Client disconnection is handled gracefully**
 - [ ] **Server handles malformed input without crashing**
 - [ ] **Thread-safe operations (no race conditions)**
@@ -200,20 +226,34 @@ Charlie: /list
 ### Load Testing
 ```bash
 # Test with multiple simultaneous connections
+cd client
 for i in {1..10}; do
-    java SimpleClient &
+    java ChatClient &
 done
 ```
 
 ## 🛠️ Advanced Configuration
 
 ### Custom Port Configuration
-```bash
-# Server
-java ChatServer 9999
 
-# Client  
-java SimpleClient localhost 9999
+**Server:**
+```bash
+cd server
+java ChatServer 9999
+```
+
+**Client:**
+
+Edit `ChatClient.java` and change the `SERVER_PORT` constant:
+```java
+private static final int SERVER_PORT = 9999;
+```
+
+Then recompile and run:
+```bash
+cd client
+javac ChatClient.java
+java ChatClient
 ```
 
 ### Server Monitoring
@@ -265,6 +305,8 @@ After completing this project, you'll understand:
 Potential improvements for advanced learning:
 
 - [ ] **GUI Client** using JavaFX or Swing
+- [ ] **Private Messaging** between specific users
+- [ ] **Chat Commands** (/help, /list, /whisper, etc.)
 - [ ] **File Transfer** capability between clients  
 - [ ] **Chat Rooms** and channel management
 - [ ] **User Authentication** and registration
